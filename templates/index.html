@@ -5,9 +5,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Epilepsy Analysis</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='output.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
 </head>
 <body>
     <!-- <script src="https://www.youtube.com/player_api"></script> -->
-    <video src="/static/Epilepsy Test_Trim.mp4" controls></video>
+    <div class="container mx-auto h-screen">
+        <h1 class="text-center text-3xl md:text-5xl font-bold border-black my-6">Epilepsy Trigger Analysis</h1>
+        <h2 class="text-center text-2xl hidden" id="counter">Triggers: <span class="text-blue-400">0</span></h2>
+        <div class="flex  md:justify-center flex-col md:space-x-2 md:flex-row w-full">
+            <div class="video md:w-1/4 w-full my-6">
+                <video src="/static/Epilepsy Test_Trim.mp4" class="w-full" controls></video>
+            </div>
+            <div class="video md:w-1/4 w-full my-6 h-48">
+                <video src="/static/no_trigger.mp4" class="w-full" controls></video>
+            </div>
+            <div class="video md:w-1/4 w-full my-6 h-48">
+                <video src="/static/night.mp4" class="w-full h-full" controls></video>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 from flask_cors import CORS
 from flask import Flask,jsonify,abort,request,render_template
-
+import math
+from image_analyzer import predict_image,load_model
 app = Flask(__name__)
 
 CORS(app)
@@ -14,10 +15,17 @@ def index():
     return render_template('index.html')
 
 
-
+@app.route('/analyze-image',methods=['POST'])
+def analyze_image():
+    try:
+        return jsonify(predict_image(request.get_json()['path'],load_model('trained_model.joblib')))
+    except Exception as e:
+        print(e)
+        abort(500)
+        
 @app.route('/analyze',methods=['POST'])
 def analyze_video():
-    print(request.get_json())
+    intensities = []
     url = request.get_json()['path']
         # Read the video
     video = cv2.VideoCapture(url)
@@ -46,6 +54,7 @@ def analyze_video():
 
         # Check if the frame is a flash by comparing the intensity with a threshold
         threshold = 100  # Adjust this threshold as needed
+        intensities.append(average_intensity)
         if average_intensity > threshold:
             flash_count += 1
 
@@ -53,10 +62,6 @@ def analyze_video():
         frame_rate = video.get(cv2.CAP_PROP_FPS)
         frame_time = 1.0 / frame_rate
         total_time += frame_time
-        flash_rate = flash_count / total_time
-            # Check if the flash rate falls within the specified range
-        if  flash_rate <= 30 and flash_rate >= 3:
-            return jsonify({"success":True,"trigger":True,"flash_rate":flash_rate,"time":total_time})
 
     # Release the video object
     video.release()
@@ -68,7 +73,7 @@ def analyze_video():
     flash_rate = flash_count / total_time
 
     # Check if the flash rate falls within the specified range
-    if 3 <= flash_rate <= 30:
+    if flash_rate >= 3.0 and flash_rate <= 50.0:
         return jsonify({"success":True,"trigger":True,"flash_rate":flash_rate})
     else:
         return jsonify({"success":True,"trigger":False,"flash_rate":flash_rate})
